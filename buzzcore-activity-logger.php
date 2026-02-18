@@ -262,23 +262,33 @@ class Plugin_Activity_Logger {
 
             if ($status || $plugin) {
 
-                $where  = "WHERE 1=1";
+                global $wpdb;
+
+                $where  = [];
                 $params = [];
 
-                if ($status) {
-                    $where .= " AND action = %s";
+                if ( $status ) {
+                    $where[]  = 'action = %s';
                     $params[] = $status;
                 }
 
-                if ($plugin) {
-                    $where .= " AND plugin_slug = %s";
+                if ( $plugin ) {
+                    $where[]  = 'plugin_slug = %s';
                     $params[] = $plugin;
                 }
 
-                $query = "DELETE FROM {$this->table} {$where}";
+                $where_sql = '';
 
-                $prepared = $wpdb->prepare($query, ...$params);
-                $wpdb->query($prepared);
+                if ( ! empty( $where ) ) {
+                    $where_sql = ' WHERE ' . implode( ' AND ', $where );
+                }
+
+                $wpdb->query(
+                    $wpdb->prepare(
+                        "DELETE FROM {$this->table}{$where_sql}",
+                        ...$params
+                    )
+                );
 
             } else {
 
@@ -286,7 +296,7 @@ class Plugin_Activity_Logger {
                 $wpdb->query("TRUNCATE TABLE {$this->table}");
             }
 
-            wp_redirect(
+            wp_safe_redirect(
                 add_query_arg('pal_cleared', '1', menu_page_url('plugin-activity-log', false))
             );
             exit;
@@ -318,50 +328,60 @@ class Plugin_Activity_Logger {
         $status    = isset($_GET['status'])    ? sanitize_text_field($_GET['status'])    : '';
         $plugin    = isset($_GET['plugin'])    ? sanitize_text_field($_GET['plugin'])    : '';
 
-        $where  = "WHERE 1=1";
-        $params = [];
+        $where_parts = [];
+        $params      = [];
 
-        if ($date_from) {
-            $where .= " AND timestamp >= %s";
-            $params[] = $date_from . ' 00:00:00';
+        if ( $date_from ) {
+            $where_parts[] = 'timestamp >= %s';
+            $params[]      = $date_from . ' 00:00:00';
         }
 
-        if ($date_to) {
-            $where .= " AND timestamp <= %s";
-            $params[] = $date_to . ' 23:59:59';
+        if ( $date_to ) {
+            $where_parts[] = 'timestamp <= %s';
+            $params[]      = $date_to . ' 23:59:59';
         }
 
-        if ($status) {
-            $where .= " AND action = %s";
-            $params[] = $status;
+        if ( $status ) {
+            $where_parts[] = 'action = %s';
+            $params[]      = $status;
         }
 
-        if ($plugin) {
-            $where .= " AND plugin_slug = %s";
-            $params[] = $plugin;
+        if ( $plugin ) {
+            $where_parts[] = 'plugin_name = %s';
+            $params[]      = $plugin;
         }
 
-        /* ---------------------------------------------------------
-           Pagination
-        --------------------------------------------------------- */
+        $where_sql = '';
 
-        $per_page = $this->get_per_page();
-        $paged = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
-        $offset = ($paged - 1) * $per_page;
+        if ( ! empty( $where_parts ) ) {
+            $where_sql = ' WHERE ' . implode( ' AND ', $where_parts );
+        }
 
-        $query = "SELECT SQL_CALC_FOUND_ROWS *
-                  FROM {$this->table}
-                  {$where}
-                  ORDER BY timestamp DESC
-                  LIMIT %d OFFSET %d";
+        /* Pagination */
+
+        $per_page = (int) $this->get_per_page();
+        $paged    = isset($_GET['paged']) ? max( 1, (int) $_GET['paged'] ) : 1;
+        $offset   = ( $paged - 1 ) * $per_page;
 
         $params[] = $per_page;
         $params[] = $offset;
 
-        $prepared = $wpdb->prepare($query, ...$params);
-        $logs = $wpdb->get_results($prepared);
+        /* Main Query */
 
-        $total = $wpdb->get_var("SELECT FOUND_ROWS()");
+        $logs = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT SQL_CALC_FOUND_ROWS *
+                 FROM {$this->table}
+                 {$where_sql}
+                 ORDER BY timestamp DESC
+                 LIMIT %d OFFSET %d",
+                ...$params
+            )
+        );
+
+        $total = (int) $wpdb->get_var(
+            $wpdb->prepare( "SELECT FOUND_ROWS()" )
+        );
         $total_pages = ceil($total / $per_page);
 
         /* ---------------------------------------------------------
@@ -369,9 +389,11 @@ class Plugin_Activity_Logger {
         --------------------------------------------------------- */
 
         $plugins = $wpdb->get_col(
-            "SELECT DISTINCT plugin_name
-             FROM {$this->table}
-             ORDER BY plugin_slug ASC"
+            $wpdb->prepare(
+                "SELECT DISTINCT plugin_name
+                 FROM {$this->table}
+                 ORDER BY plugin_slug ASC"
+            )
         );
 
         ?>
