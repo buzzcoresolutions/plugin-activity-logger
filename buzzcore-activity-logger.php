@@ -465,7 +465,7 @@ class Plugin_Activity_Logger {
             <?php if ($total_pages > 1): ?>
                 <div style="margin-top:20px;">
                     <?php
-                    echo paginate_links([
+                    $links = paginate_links([
                         'base' => add_query_arg([
                             'paged' => '%#%',
                             'date_from' => $date_from,
@@ -477,6 +477,7 @@ class Plugin_Activity_Logger {
                         'current' => $paged,
                         'total'   => $total_pages,
                     ]);
+                    echo wp_kses_post( $links );
                     ?>
                 </div>
             <?php endif; ?>
