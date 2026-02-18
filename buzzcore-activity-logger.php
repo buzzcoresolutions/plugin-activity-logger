@@ -8,6 +8,8 @@ Author: BuzzCore Solutions
 Author URI:  https://buzzcoresolutions.com/
 Text Domain: buzzcore-activity-logger
 Domain Path: /languages
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
 if (!defined('ABSPATH')) exit;
