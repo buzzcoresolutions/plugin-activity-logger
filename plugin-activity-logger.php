@@ -1,11 +1,13 @@
 <?php
 /*
 Plugin Name: Plugin Activity Logger
-Plugin URI:  https://github.com/buzzcoresolutions/plugin-activity-logger
-Description: Logs plugin activities, shows status icons in Plugins page, and provides a full activity log page with filtering.
+Plugin URI:  https://buzzcoresolutions.com/
+Description: Logs plugin activities, shows status icons in the Plugins page, and provides a full activity log page with filtering.
 Version: 1.0
 Author: BuzzCore Solutions
-Author URI:  https://github.com/buzzcoresolutions
+Author URI:  https://buzzcoresolutions.com/
+Text Domain: plugin-activity-logger
+Domain Path: /languages
 */
 
 
