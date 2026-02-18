@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Plugin Activity Logger
+Plugin Name: BuzzCore Activity Logger
 Plugin URI:  https://buzzcoresolutions.com/
 Description: Logs plugin activities, shows status icons in the Plugins page, and provides a full activity log page with filtering.
 Version: 1.0

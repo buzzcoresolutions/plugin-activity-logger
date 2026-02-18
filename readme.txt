@@ -1,4 +1,4 @@
-=== Plugin Activity Logger ===
+=== BuzzCore Activity Logger ===
 Contributors: buzzcoresolutions
 Tags: plugin, activity, logger, admin, tools
 Requires at least: 6.0
