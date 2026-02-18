@@ -1,15 +1,14 @@
 <?php
 /*
 Plugin Name: BuzzCore Activity Logger
-Plugin URI:  https://buzzcoresolutions.com/
-Description: Logs plugin activities, shows status icons in the Plugins page, and provides a full activity log page with filtering.
+Plugin URI:  https://github.com/buzzcoresolutions/buzzcore-activity-logger
+Description: Logs plugin activities, shows status icons in admin pages, and provides a full activity log page with filtering.
 Version: 1.0
 Author: BuzzCore Solutions
 Author URI:  https://buzzcoresolutions.com/
-Text Domain: plugin-activity-logger
+Text Domain: buzzcore-activity-logger
 Domain Path: /languages
 */
-
 
 if (!defined('ABSPATH')) exit;
 
